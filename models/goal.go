@@ -1,15 +1,16 @@
 package models
 
-import (
-	"encoding/json"
-	"fmt"
-	"os"
-	"time"
-)
+import "github.com/kamva/mgm/v3"
 
 type Goal struct {
-	ID          int64
-	Name        string
-	Description string
-	DateTime    time.Time
+	mgm.DefaultModel `bson:",inline"`
+	Name             string `json:"name" bson:"name"`
+	Description      string `json:"description" bson:"description"`
+}
+
+func NewGoal(name string, description string) *Goal {
+	return &Goal{
+		Name:        name,
+		Description: description,
+	}
 }
