@@ -11,7 +11,7 @@ import (
 
 func InitMongoDB() {
 	// Setup the mgm default config
-	err := mgm.SetDefaultConfig(nil, "note", options.Client().ApplyURI("mongodb://localhost:27017"))
+	err := mgm.SetDefaultConfig(nil, "note", options.Client().ApplyURI("mongodb+srv://akif:akif@cluster0.61sku.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"))
 	if err != nil {
 		panic(err)
 	}

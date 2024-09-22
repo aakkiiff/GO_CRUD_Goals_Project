@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/kamva/mgm/v3"
@@ -17,12 +15,24 @@ func hello(context *gin.Context) {
 
 func createGoal(c *gin.Context) {
 	var goalReq models.Goal
-	var goal models.Goal
-	_ = c.ShouldBindBodyWith(&goalReq, binding.JSON)
-	fmt.Println(goalReq)
+
+	// Bind request body to goalReq and handle any errors
+	if err := c.ShouldBindJSON(&goalReq); err != nil {
+		c.JSON(400, gin.H{"error": "Invalid request payload"})
+		return
+	}
+
+	// Create a new goal from the request data
 	goalData := models.NewGoal(goalReq.Description, goalReq.Name)
-	mgm.Coll(&goal).Create(goalData)
-	c.JSON(200, gin.H{"message": "goal saved", "goal": goalData})
+
+	// Save the goal to the database and handle potential errors
+	if err := mgm.Coll(goalData).Create(goalData); err != nil {
+		c.JSON(500, gin.H{"error": "Failed to save goal"})
+		return
+	}
+
+	// Return a success response
+	c.JSON(200, gin.H{"message": "Goal saved", "goal": goalData})
 }
 
 func getGoals(c *gin.Context) {
