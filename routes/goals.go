@@ -3,8 +3,31 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/kamva/mgm/v3"
+	"go.mongodb.org/mongo-driver/bson"
 	"goals.com/models"
 )
+
+func getGoal(c *gin.Context) {
+	var NewGoal models.Goal
+	id := c.Param("id")
+	coll := mgm.Coll(&NewGoal)
+	_ = coll.FindByID(id, &NewGoal)
+	if NewGoal.Name == "" {
+		c.JSON(400, gin.H{"message": "invalid id provided"})
+		return
+	}
+	c.JSON(200, gin.H{"message": "Goals successfully retrieved!", "goal": NewGoal})
+
+}
+func getGoals(c *gin.Context) {
+	var goals []models.Goal
+	err := mgm.Coll(&models.Goal{}).SimpleFind(&goals, bson.M{})
+	if err != nil {
+		c.JSON(400, gin.H{"message": "could not retrieve the goals", "error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"message": "Goals successfully retrieved!", "goal": goals})
+}
 
 func createGoal(c *gin.Context) {
 	var NewGoal models.Goal
