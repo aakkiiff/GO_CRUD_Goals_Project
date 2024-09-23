@@ -1,0 +1,10 @@
+services:
+  go_backend:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      - USERNAME=akif
+      - PASSWORD=akif
+    ports:
+      - 8080:8080
