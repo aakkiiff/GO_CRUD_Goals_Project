@@ -63,5 +63,31 @@ func deleteGoal(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "could not delete data to database!"})
 		return
 	}
-	c.JSON(200, gin.H{"message": NewGoal.Name + "Goal successfully Deleted!", "goal": NewGoal})
+	c.JSON(200, gin.H{"message": NewGoal.Name + " Goal successfully Deleted!", "goal": NewGoal})
+}
+
+func updateGoal(c *gin.Context) {
+	var NewGoal models.Goal
+	id := c.Param("id")
+	coll := mgm.Coll(&NewGoal)
+	_ = coll.FindByID(id, &NewGoal)
+	if NewGoal.Name == "" {
+		c.JSON(400, gin.H{"message": "goal not found"})
+		return
+	}
+	fmt.Println(NewGoal)
+
+	err := c.ShouldBindJSON(&NewGoal)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid request payload"})
+		return
+	}
+	fmt.Println(NewGoal)
+
+	mgm.Coll(&NewGoal).Update(&NewGoal)
+	c.JSON(200, gin.H{
+		"message": `Goal successfully Updated!`,
+		"goal":    NewGoal,
+	})
+
 }
