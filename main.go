@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+	gin.SetMode(gin.ReleaseMode)
 	server := gin.Default()
 	db.InitMongoDB()
 	routes.RegisterRoutes(server)
