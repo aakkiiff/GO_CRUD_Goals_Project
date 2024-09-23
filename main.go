@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -11,7 +12,7 @@ import (
 
 func initMongoDB() {
 	// Setup the mgm default config
-	err := mgm.SetDefaultConfig(nil, "goals", options.Client().ApplyURI("mongodb+srv://akif:akif@cluster0.61sku.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"))
+	err := mgm.SetDefaultConfig(nil, "goals", options.Client().ApplyURI("mongodb+srv://akif:akif@cluster0.61sku.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0").SetTLSConfig(&tls.Config{InsecureSkipVerify: true}))
 	if err != nil {
 		panic("could not connect to the database!")
 	}
