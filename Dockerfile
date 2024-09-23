@@ -13,17 +13,15 @@ WORKDIR /app
 
 COPY go.mod ./
 COPY go.sum ./
-# COPY operator_helm_packages /operator_helm_packages
-# COPY ansible /ansible
-
 
 RUN go mod download && go mod verify
 
-# COPY *.go ./
 COPY . .
 
 RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o server -a -ldflags="-s -w" -installsuffix cgo
+
 # RUN upx --ultra-brute -qq server && upx -t server
+
 FROM scratch
 
 COPY --from=build /app/server /server
