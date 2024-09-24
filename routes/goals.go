@@ -28,7 +28,11 @@ func getGoals(c *gin.Context) {
 		c.JSON(400, gin.H{"message": "could not retrieve the goals", "error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"message": "Goals successfully retrieved!", "goal": goals})
+	count,err := count()
+
+	fmt.Println(count.Count)
+
+	c.JSON(200, gin.H{"message": "Goals successfully retrieved!", "goal": goals,"Total API Call":count.Count})
 }
 
 func createGoal(c *gin.Context) {
@@ -90,4 +94,24 @@ func updateGoal(c *gin.Context) {
 		"goal":    NewGoal,
 	})
 
+}
+
+func count() (*models.Counter,error) {
+	var NewCounter models.Counter
+	coll := mgm.Coll(&NewCounter)
+	_ = coll.First(bson.M{}, &NewCounter)
+
+	if NewCounter.Count == 0 {
+		err := mgm.Coll(&NewCounter).Create(&NewCounter)
+		if err != nil {
+			return nil,err
+		}
+	}
+	NewCounter.Count++
+	err := mgm.Coll(&NewCounter).Update(&NewCounter)
+	if err != nil {
+		return nil,err
+	}
+	
+	return &NewCounter,nil
 }
