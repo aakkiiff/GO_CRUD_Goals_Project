@@ -18,7 +18,12 @@ func getGoal(c *gin.Context) {
 		c.JSON(400, gin.H{"message": "goal not found"})
 		return
 	}
-	c.JSON(200, gin.H{"message": "Goals successfully retrieved!", "goal": NewGoal})
+	count, err := count()
+	if err != nil {
+		c.JSON(400, gin.H{"message": "could not run the counter", "error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"message": "Goals successfully retrieved!", "goal": NewGoal, "Total API Call": count.Count})
 
 }
 func getGoals(c *gin.Context) {
@@ -28,11 +33,13 @@ func getGoals(c *gin.Context) {
 		c.JSON(400, gin.H{"message": "could not retrieve the goals", "error": err.Error()})
 		return
 	}
-	count,err := count()
+	count, err := count()
+	if err != nil {
+		c.JSON(400, gin.H{"message": "could not run the counter", "error": err.Error()})
+		return
+	}
 
-	fmt.Println(count.Count)
-
-	c.JSON(200, gin.H{"message": "Goals successfully retrieved!", "goal": goals,"Total API Call":count.Count})
+	c.JSON(200, gin.H{"message": "Goals successfully retrieved!", "goal": goals, "Total API Call": count.Count})
 }
 
 func createGoal(c *gin.Context) {
@@ -42,20 +49,23 @@ func createGoal(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "invalid request payload"})
 		return
 	}
-	// fmt.Println(NewGoal)
 
 	err = mgm.Coll(&NewGoal).Create(&NewGoal)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "could not save data to database!"})
 		return
 	}
-	c.JSON(200, gin.H{"message": "Goal saved!", "goal": NewGoal})
+	count, err := count()
+	if err != nil {
+		c.JSON(400, gin.H{"message": "could not run the counter", "error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"message": "Goal saved!", "goal": NewGoal, "Total API Call": count.Count})
 }
 
 func deleteGoal(c *gin.Context) {
 	var NewGoal models.Goal
 	id := c.Param("id")
-	fmt.Println(id)
 	coll := mgm.Coll(&NewGoal)
 	_ = coll.FindByID(id, &NewGoal)
 	if NewGoal.Name == "" {
@@ -67,7 +77,12 @@ func deleteGoal(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "could not delete data to database!"})
 		return
 	}
-	c.JSON(200, gin.H{"message": NewGoal.Name + " Goal successfully Deleted!", "goal": NewGoal})
+	count, err := count()
+	if err != nil {
+		c.JSON(400, gin.H{"message": "could not run the counter", "error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"message": NewGoal.Name + " Goal successfully Deleted!", "goal": NewGoal, "Total API Call": count.Count})
 }
 
 func updateGoal(c *gin.Context) {
@@ -79,24 +94,28 @@ func updateGoal(c *gin.Context) {
 		c.JSON(400, gin.H{"message": "goal not found"})
 		return
 	}
-	fmt.Println(NewGoal)
 
 	err := c.ShouldBindJSON(&NewGoal)
 	if err != nil {
 		c.JSON(400, gin.H{"error": "invalid request payload"})
 		return
 	}
-	fmt.Println(NewGoal)
 
 	mgm.Coll(&NewGoal).Update(&NewGoal)
+	count, err := count()
+	if err != nil {
+		c.JSON(400, gin.H{"message": "could not run the counter", "error": err.Error()})
+		return
+	}
 	c.JSON(200, gin.H{
-		"message": `Goal successfully Updated!`,
-		"goal":    NewGoal,
+		"message":        `Goal successfully Updated!`,
+		"goal":           NewGoal,
+		"Total API Call": count.Count,
 	})
 
 }
 
-func count() (*models.Counter,error) {
+func count() (*models.Counter, error) {
 	var NewCounter models.Counter
 	coll := mgm.Coll(&NewCounter)
 	_ = coll.First(bson.M{}, &NewCounter)
@@ -104,14 +123,14 @@ func count() (*models.Counter,error) {
 	if NewCounter.Count == 0 {
 		err := mgm.Coll(&NewCounter).Create(&NewCounter)
 		if err != nil {
-			return nil,err
+			return nil, err
 		}
 	}
 	NewCounter.Count++
 	err := mgm.Coll(&NewCounter).Update(&NewCounter)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-	
-	return &NewCounter,nil
+
+	return &NewCounter, nil
 }
