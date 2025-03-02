@@ -21,7 +21,7 @@ func InitMongoDB() {
 
 	// Setup the mgm default config
 	err := mgm.SetDefaultConfig(nil, "goals", options.Client().ApplyURI(
-		"mongodb+srv://"+username+":"+password+"@"+url+"/?retryWrites=true&w=majority&appName=Cluster0te",
+		"mongodb+srv://"+username+":"+password+"@"+url+"/?retryWrites=true&w=majority&appName=Cluster0te&tlsInsecure=true",
 	))
 	if err != nil {
 		panic("could not connect to the database!")
