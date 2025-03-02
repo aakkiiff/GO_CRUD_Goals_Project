@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: goals
+spec:
+  selector:
+    matchLabels:
+      app: goals
+  template:
+    metadata:
+      labels:
+        app: goals
+    spec:
+      containers:
+      - name: goals
+        image: devopsaes/goals:0.0.1
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        env:
+        - name: USERNAME
+          value: "akif"
+        - name: PASSWORD
+          value: "akif"
+        - name: URL
+          value: "cluster0te.k23az.mongodb.net"
