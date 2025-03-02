@@ -12,6 +12,7 @@ func InitMongoDB() {
 	// Retrieve environment variables
 	username := os.Getenv("USERNAME")
 	password := os.Getenv("PASSWORD")
+	url := os.Getenv("URL")
 
 	// Check if environment variables are set
 	if username == "" || password == "" {
@@ -20,7 +21,7 @@ func InitMongoDB() {
 
 	// Setup the mgm default config
 	err := mgm.SetDefaultConfig(nil, "goals", options.Client().ApplyURI(
-		"mongodb+srv://"+username+":"+password+"@cluster0.61sku.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&tlsInsecure=true",
+		"mongodb+srv://"+username+":"+password+"@"+url+"/?retryWrites=true&w=majority&appName=Cluster0te",
 	))
 	if err != nil {
 		panic("could not connect to the database!")

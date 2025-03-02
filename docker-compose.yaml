@@ -6,5 +6,6 @@ services:
     environment:
       - USERNAME=akif
       - PASSWORD=akif
+      - URL=cluster0te.k23az.mongodb.net
     ports:
       - 8080:8080
